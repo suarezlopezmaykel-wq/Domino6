@@ -486,8 +486,9 @@ jobs:
           print("Icono añadido al Manifest.")
           PY
 
-      - name: Verificar código
+            - name: Verificar código
         run: |
+          sed -i 's/[[:space:]]*$//' Domino6/app/src/main/java/com/example/domino6/MainActivity.java
           grep -n "class DominoTile" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
           grep -n "ic_domino6" Domino6/app/src/main/AndroidManifest.xml
           git diff --check
