@@ -57,16 +57,18 @@ jobs:
 
           new = 'String trancaText(){StringBuilder s=new StringBuilder("PARTIDA TRANCADA\\n\\n");int best=Integer.MAX_VALUE;ArrayList<Integer>winners=new ArrayList<>();for(int i=0;i<n;i++){int x=points(hands.get(i));s.append("Jugador ").append(i+1).append(": ").append(x).append(" puntos\\n");if(x<best){best=x;winners.clear();winners.add(i);}else if(x==best){winners.add(i);}}s.append("\\n");if(winners.size()==1)s.append("🏆 Gana Jugador ").append(winners.get(0)+1).append(" con ").append(best).append(" puntos.");else s.append("⚖ Empate entre jugadores con ").append(best).append(" puntos.");return s.toString();}'
 
-          replace(
-              old,
-              new,
-              'calculo correcto de ganador de tranca'
-          )
+          replace(old,new,'calculo correcto de ganador de tranca')
 
           replace(
               'return "STATE|"+p+"|"+turn+"|"+(first?"1":"0")+"|"+left+"|"+right+"|"+passCount+"|"+(finished?"1":"0")+"|"+h+"|"+c;',
               'return "STATE|"+p+"|"+turn+"|"+(first?"1":"0")+"|"+left+"|"+right+"|"+passCount+"|"+(finished?"1":"0")+"|"+winner+"|"+result.replace("\\n","~")+"|"+h+"|"+c;',
               'transmision del resultado'
+          )
+
+          replace(
+              'BluetoothDevice dev;BluetoothSocket socket;BufferedReader in;PrintWriter out;int me=-1,n=0;ArrayList<Domino> hand=new ArrayList<>(),chain=new ArrayList<>();int turn;boolean first;int left,right,passCount,finished;',
+              'BluetoothDevice dev;BluetoothSocket socket;BufferedReader in;PrintWriter out;int me=-1,n=0;ArrayList<Domino> hand=new ArrayList<>(),chain=new ArrayList<>();int turn;boolean first;int left,right,passCount,finished,winner=-1;String result="";',
+              'variables de resultado del cliente'
           )
 
           replace(
@@ -87,20 +89,45 @@ jobs:
               'resultado visible en cliente'
           )
 
+          replace(
+              'void broadcast(){if(game==null)return;String msg=game.stateFor(0);for(Peer p:peers)p.send(game.stateFor(p.id));}',
+              'void broadcast(){if(game==null)return;for(Peer p:peers)p.send(game.stateFor(p.id));runOnUiThread(()->{if(game!=null)new HostGameView().show();});}',
+              'actualizacion de pantalla del anfitrion'
+          )
+
+          replace(
+              'b.setOnClickListener(v->host.action(0,"PLAY|"+ix));',
+              'b.setEnabled(!host.game.finished);b.setOnClickListener(v->host.action(0,"PLAY|"+ix));',
+              'desactivar fichas al terminar'
+          )
+
+          replace(
+              'Button pass=btn("Pasar");addView(pass);',
+              'Button pass=btn("Pasar");pass.setEnabled(host.game==null||!host.game.finished);addView(pass);',
+              'desactivar pasar al terminar'
+          )
+
+          replace(
+              'if(host.game==null)return"Esperando jugadores…";if(host.game.finished)return"Mano terminada";return host.game.turn==0?"Tu turno":"Turno del Jugador "+(host.game.turn+1);',
+              'if(host.game==null)return"Esperando jugadores…";if(host.game.finished)return host.game.result;return host.game.turn==0?"Tu turno":"Turno del Jugador "+(host.game.turn+1);',
+              'resultado visible en anfitrion'
+          )
+
           p.write_text(s)
-          print("V4 preparada correctamente.")
+          print("V4 corregida correctamente.")
           PY
 
       - name: Verificar cambios
         run: |
           git diff --check
           grep -n "winner" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
-          grep -n "trancaText" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n "result" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n "broadcast" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
 
       - name: Guardar V4
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Domino6/app/src/main/java/com/example/domino6/MainActivity.java
-          git diff --cached --quiet || git commit -m "Crear V4 con resultado de tranca"
+          git diff --cached --quiet || git commit -m "Completar V4 Bluetooth con resultado de tranca"
           git push
