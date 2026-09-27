@@ -1,4 +1,4 @@
-name: Crear V4 - Resultado de Tranca
+name: Completar V4 Domino6
 
 on:
   workflow_dispatch:
@@ -7,14 +7,14 @@ permissions:
   contents: write
 
 jobs:
-  modificar:
+  completar:
     runs-on: ubuntu-latest
 
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
 
-      - name: Modificar MainActivity.java
+      - name: Completar V4
         run: |
           python3 <<'PY'
           from pathlib import Path
@@ -25,86 +25,32 @@ jobs:
           def replace(old, new, label):
               global s
               if old not in s:
-                  raise SystemExit(f"ERROR: no se encontro el bloque: {label}")
+                  raise SystemExit(f"ERROR: no se encontro: {label}")
               s = s.replace(old, new, 1)
-              print(f"OK: {label}")
+              print("OK:", label)
 
           replace(
-              'if(game==null||game.turn!=player)return;',
-              'if(game==null||game.finished||game.turn!=player)return;',
-              'proteccion de partida terminada'
+              'ArrayList<Domino> hand=new ArrayList<>(),chain=new ArrayList<>();int turn;boolean first;int left,right,passCount,finished;',
+              'ArrayList<Domino> hand=new ArrayList<>(),chain=new ArrayList<>();int turn;boolean first;int left,right,passCount,finished,winner=-1;String result="";',
+              'variables winner y result del cliente'
           )
 
           replace(
-              'int n,turn=0,left,right,passCount=0;boolean first=true,finished=false;',
-              'int n,turn=0,left,right,passCount=0;boolean first=true,finished=false;int winner=-1;String result="";',
-              'variables de resultado'
-          )
-
-          replace(
-              'if(hands.get(p).isEmpty()){finished=true;return;}',
-              'if(hands.get(p).isEmpty()){finished=true;winner=p;result="🏆 Gana Jugador "+(p+1)+" porque se quedó sin fichas.";return;}',
-              'resultado por quedarse sin fichas'
-          )
-
-          replace(
-              'if(passCount>=n){finished=true;return;}turn=(turn+1)%n;',
-              'if(passCount>=n){finished=true;result=trancaText();return;}turn=(turn+1)%n;',
-              'resultado por tranca'
-          )
-
-          old = 'String trancaText(){StringBuilder s=new StringBuilder("PARTIDA TRANCADA\\n\\n");int best=Integer.MAX_VALUE,w=-1;for(int i=0;i<n;i++){int x=points(hands.get(i));s.append("Jugador ").append(i+1).append(": ").append(x).append(" puntos\\n");if(x<best){best=x;w=i;}}if(w>=0)s.append("\\n🏆 Gana Jugador ").append(w+1).append(" con ").append(best).append(" puntos.");return s.toString();}'
-
-          new = 'String trancaText(){StringBuilder s=new StringBuilder("PARTIDA TRANCADA\\n\\n");int best=Integer.MAX_VALUE;ArrayList<Integer>winners=new ArrayList<>();for(int i=0;i<n;i++){int x=points(hands.get(i));s.append("Jugador ").append(i+1).append(": ").append(x).append(" puntos\\n");if(x<best){best=x;winners.clear();winners.add(i);}else if(x==best){winners.add(i);}}s.append("\\n");if(winners.size()==1)s.append("🏆 Gana Jugador ").append(winners.get(0)+1).append(" con ").append(best).append(" puntos.");else s.append("⚖ Empate entre jugadores con ").append(best).append(" puntos.");return s.toString();}'
-
-          replace(old,new,'calculo correcto de ganador de tranca')
-
-          replace(
-              'return "STATE|"+p+"|"+turn+"|"+(first?"1":"0")+"|"+left+"|"+right+"|"+passCount+"|"+(finished?"1":"0")+"|"+h+"|"+c;',
-              'return "STATE|"+p+"|"+turn+"|"+(first?"1":"0")+"|"+left+"|"+right+"|"+passCount+"|"+(finished?"1":"0")+"|"+winner+"|"+result.replace("\\n","~")+"|"+h+"|"+c;',
-              'transmision del resultado'
-          )
-
-          replace(
-              'BluetoothDevice dev;BluetoothSocket socket;BufferedReader in;PrintWriter out;int me=-1,n=0;ArrayList<Domino> hand=new ArrayList<>(),chain=new ArrayList<>();int turn;boolean first;int left,right,passCount,finished;',
-              'BluetoothDevice dev;BluetoothSocket socket;BufferedReader in;PrintWriter out;int me=-1,n=0;ArrayList<Domino> hand=new ArrayList<>(),chain=new ArrayList<>();int turn;boolean first;int left,right,passCount,finished,winner=-1;String result="";',
-              'variables de resultado del cliente'
-          )
-
-          replace(
-              'turn=Integer.parseInt(a[2]);first="1".equals(a[3]);',
-              'turn=Integer.parseInt(a[2]);winner=Integer.parseInt(a[8]);result=a[9].replace("~","\\n");first="1".equals(a[3]);',
-              'lectura del resultado'
-          )
-
-          replace(
-              'hand=parseDominoList(a[8]);chain=parseDominoList(a.length>9?a[9]:"");',
-              'hand=parseDominoList(a.length>10?a[10]:"");chain=parseDominoList(a.length>11?a[11]:"");',
-              'nuevos campos de estado'
-          )
-
-          replace(
-              'l.addView(txt(finished?"Mano terminada":turn==me?"TU TURNO":"Turno del Jugador "+(turn+1)));',
-              'l.addView(txt(finished?result:(turn==me?"TU TURNO":"Turno del Jugador "+(turn+1))));',
-              'resultado visible en cliente'
-          )
-
-          replace(
-              'void broadcast(){if(game==null)return;String msg=game.stateFor(0);for(Peer p:peers)p.send(game.stateFor(p.id));}',
+              'void broadcast(){if(game==null)return;for(Peer p:peers)p.send(game.stateFor(p.id));}',
               'void broadcast(){if(game==null)return;for(Peer p:peers)p.send(game.stateFor(p.id));runOnUiThread(()->{if(game!=null)new HostGameView().show();});}',
-              'actualizacion de pantalla del anfitrion'
+              'actualizacion del anfitrion'
           )
 
           replace(
               'b.setOnClickListener(v->host.action(0,"PLAY|"+ix));',
               'b.setEnabled(!host.game.finished);b.setOnClickListener(v->host.action(0,"PLAY|"+ix));',
-              'desactivar fichas al terminar'
+              'bloqueo de fichas al terminar'
           )
 
           replace(
               'Button pass=btn("Pasar");addView(pass);',
               'Button pass=btn("Pasar");pass.setEnabled(host.game==null||!host.game.finished);addView(pass);',
-              'desactivar pasar al terminar'
+              'bloqueo de pasar al terminar'
           )
 
           replace(
@@ -114,20 +60,20 @@ jobs:
           )
 
           p.write_text(s)
-          print("V4 corregida correctamente.")
+          print("V4 completada.")
           PY
 
-      - name: Verificar cambios
+      - name: Verificar
         run: |
           git diff --check
-          grep -n "winner" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
-          grep -n "result" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
-          grep -n "broadcast" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n "winner=-1" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n "runOnUiThread" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n "host.game.result" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
 
-      - name: Guardar V4
+      - name: Guardar
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Domino6/app/src/main/java/com/example/domino6/MainActivity.java
-          git diff --cached --quiet || git commit -m "Completar V4 Bluetooth con resultado de tranca"
+          git diff --cached --quiet || git commit -m "Completar V4 de Domino6"
           git push
