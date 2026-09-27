@@ -36,21 +36,31 @@ jobs:
           )
 
           replace(
-              'int n,turn=0,left,right,passCount=0;',
-              'int n,turn=0,left,right,passCount=0;\\n    int winner=-1;\\n    String result="";',
+              'int n,turn=0,left,right,passCount=0;boolean first=true,finished=false;',
+              'int n,turn=0,left,right,passCount=0;boolean first=true,finished=false;int winner=-1;String result="";',
               'variables de resultado'
           )
 
           replace(
               'if(hands.get(p).isEmpty()){finished=true;return;}',
-              'if(hands.get(p).isEmpty()){\\n            finished=true;\\n            winner=p;\\n            result="🏆 Gana Jugador "+(p+1)+" porque se quedó sin fichas.";\\n            return;\\n        }',
+              'if(hands.get(p).isEmpty()){finished=true;winner=p;result="🏆 Gana Jugador "+(p+1)+" porque se quedó sin fichas.";return;}',
               'resultado por quedarse sin fichas'
           )
 
           replace(
-              'if(passCount>=n){finished=true;return;}',
-              'if(passCount>=n){\\n            finished=true;\\n            result=trancaText();\\n            return;\\n        }',
+              'if(passCount>=n){finished=true;return;}turn=(turn+1)%n;',
+              'if(passCount>=n){finished=true;result=trancaText();return;}turn=(turn+1)%n;',
               'resultado por tranca'
+          )
+
+          old = 'String trancaText(){StringBuilder s=new StringBuilder("PARTIDA TRANCADA\\n\\n");int best=Integer.MAX_VALUE,w=-1;for(int i=0;i<n;i++){int x=points(hands.get(i));s.append("Jugador ").append(i+1).append(": ").append(x).append(" puntos\\n");if(x<best){best=x;w=i;}}if(w>=0)s.append("\\n🏆 Gana Jugador ").append(w+1).append(" con ").append(best).append(" puntos.");return s.toString();}'
+
+          new = 'String trancaText(){StringBuilder s=new StringBuilder("PARTIDA TRANCADA\\n\\n");int best=Integer.MAX_VALUE;ArrayList<Integer>winners=new ArrayList<>();for(int i=0;i<n;i++){int x=points(hands.get(i));s.append("Jugador ").append(i+1).append(": ").append(x).append(" puntos\\n");if(x<best){best=x;winners.clear();winners.add(i);}else if(x==best){winners.add(i);}}s.append("\\n");if(winners.size()==1)s.append("🏆 Gana Jugador ").append(winners.get(0)+1).append(" con ").append(best).append(" puntos.");else s.append("⚖ Empate entre jugadores con ").append(best).append(" puntos.");return s.toString();}'
+
+          replace(
+              old,
+              new,
+              'calculo correcto de ganador de tranca'
           )
 
           replace(
@@ -59,59 +69,15 @@ jobs:
               'transmision del resultado'
           )
 
-          old = '''        int best=Integer.MAX_VALUE,w=-1;
-          for(int i=0;i<n;i++){
-              int x=points(hands.get(i));
-              s.append("Jugador ").append(i+1).append(": ").append(x).append(" puntos\\\\n");
-              if(x<best){best=x;w=i;}
-          }
-          if(w>=0)
-              s.append("\\\\n🏆 Gana Jugador ").append(w+1).append(" con ").append(best).append(" puntos.");
-          return s.toString();'''
-
-          new = '''        int best=Integer.MAX_VALUE;
-          ArrayList<Integer> winners=new ArrayList<>();
-
-          for(int i=0;i<n;i++){
-              int x=points(hands.get(i));
-              s.append("Jugador ").append(i+1).append(": ").append(x).append(" puntos\\\\n");
-
-              if(x<best){
-                  best=x;
-                  winners.clear();
-                  winners.add(i);
-              }else if(x==best){
-                  winners.add(i);
-              }
-          }
-
-          s.append("\\\\n");
-
-          if(winners.size()==1){
-              s.append("🏆 Gana Jugador ")
-               .append(winners.get(0)+1)
-               .append(" con ")
-               .append(best)
-               .append(" puntos.");
-          }else{
-              s.append("⚖ Empate entre jugadores con ")
-               .append(best)
-               .append(" puntos.");
-          }
-
-          return s.toString();'''
-
-          replace(old, new, 'calculo correcto de ganador de tranca')
-
           replace(
-              'turn=Integer.parseInt(a[2]);',
-              'turn=Integer.parseInt(a[2]);\\n    winner=Integer.parseInt(a[8]);\\n    result=a[9].replace("~","\\\\n");',
+              'turn=Integer.parseInt(a[2]);first="1".equals(a[3]);',
+              'turn=Integer.parseInt(a[2]);winner=Integer.parseInt(a[8]);result=a[9].replace("~","\\n");first="1".equals(a[3]);',
               'lectura del resultado'
           )
 
           replace(
-              'hand=parseDominoList(a[8]);\\n        chain=parseDominoList(a.length>9?a[9]:"");',
-              'hand=parseDominoList(a.length>10?a[10]:"");\\n        chain=parseDominoList(a.length>11?a[11]:"");',
+              'hand=parseDominoList(a[8]);chain=parseDominoList(a.length>9?a[9]:"");',
+              'hand=parseDominoList(a.length>10?a[10]:"");chain=parseDominoList(a.length>11?a[11]:"");',
               'nuevos campos de estado'
           )
 
@@ -128,7 +94,8 @@ jobs:
       - name: Verificar cambios
         run: |
           git diff --check
-          git diff -- Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n "winner" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n "trancaText" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
 
       - name: Guardar V4
         run: |
