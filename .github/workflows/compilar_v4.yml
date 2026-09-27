@@ -1,0 +1,77 @@
+name: Corregir y compilar V4 Domino6
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Corregir código V4
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          p = Path("Domino6/app/src/main/java/com/example/domino6/MainActivity.java")
+          s = p.read_text()
+
+          old = 'int turn;boolean first;int left,right,passCount,finished,winner=-1;String result="";'
+          new = 'int turn;boolean first;int left,right,passCount;boolean finished;int winner=-1;String result="";'
+
+          if old not in s:
+              raise SystemExit("No se encontró la declaración del cliente")
+
+          s = s.replace(old, new, 1)
+
+          old = 'Button pass=btn("Pasar");pass.setEnabled(host.game==null||!host.game.finished);addView(pass);'
+          new = 'Button pass=btn("Pasar");addView(pass);'
+
+          if old not in s:
+              raise SystemExit("No se encontró el botón Pasar del juego local")
+
+          s = s.replace(old, new, 1)
+
+          p.write_text(s)
+          print("Correcciones aplicadas.")
+
+          PY
+
+      - name: Verificar Java
+        run: |
+          grep -n 'boolean finished' Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n 'winner=-1' Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          git diff --check
+
+      - name: Guardar correcciones
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          git diff --cached --quiet || git commit -m "Corregir cliente V4 Domino6"
+          git push
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Compilar APK V4
+        working-directory: Domino6
+        run: gradle assembleDebug --stacktrace
+
+      - name: Guardar APK V4
+        uses: actions/upload-artifact@v4
+        with:
+          name: Domino6-V4-debug
+          path: Domino6/app/build/outputs/apk/debug/app-debug.apk
