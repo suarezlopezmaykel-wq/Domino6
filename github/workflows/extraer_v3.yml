@@ -1,0 +1,36 @@
+name: Extraer proyecto V3
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extraer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v6
+
+      - name: Extraer ZIP V3
+        run: |
+          rm -rf extracted
+          mkdir extracted
+          unzip -o Domino6_v3_bluetooth.zip -d extracted
+          find extracted -type f | sort
+
+      - name: Colocar archivos del proyecto
+        run: |
+          cp -R extracted/. .
+          rm -rf extracted
+
+      - name: Guardar proyecto extraído
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git reset -- Domino6_v3_bluetooth.zip
+          git diff --cached --quiet || git commit -m "Extraer proyecto V3 para revisión"
+          git push
