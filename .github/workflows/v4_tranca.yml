@@ -29,51 +29,57 @@ jobs:
               s = s.replace(old, new, 1)
               print("OK:", label)
 
+          # 1. Variables necesarias para recibir el resultado
           replace(
               'ArrayList<Domino> hand=new ArrayList<>(),chain=new ArrayList<>();int turn;boolean first;int left,right,passCount,finished;',
               'ArrayList<Domino> hand=new ArrayList<>(),chain=new ArrayList<>();int turn;boolean first;int left,right,passCount,finished,winner=-1;String result="";',
-              'variables winner y result del cliente'
+              'variables del cliente'
           )
 
+          # 2. Actualizar pantalla del anfitrión después de cada jugada
           replace(
-              'void broadcast(){if(game==null)return;for(Peer p:peers)p.send(game.stateFor(p.id));}',
-              'void broadcast(){if(game==null)return;for(Peer p:peers)p.send(game.stateFor(p.id));runOnUiThread(()->{if(game!=null)new HostGameView().show();});}',
+              'void broadcast(){if(game==null)return;String msg=game.stateFor(0);for(Peer p:peers)p.send(game.stateFor(p.id));}',
+              'void broadcast(){if(game==null)return;String msg=game.stateFor(0);for(Peer p:peers)p.send(game.stateFor(p.id));runOnUiThread(()->{if(game!=null)new HostGameView().show();});}',
               'actualizacion del anfitrion'
           )
 
+          # 3. Desactivar fichas después de terminar
           replace(
               'b.setOnClickListener(v->host.action(0,"PLAY|"+ix));',
               'b.setEnabled(!host.game.finished);b.setOnClickListener(v->host.action(0,"PLAY|"+ix));',
-              'bloqueo de fichas al terminar'
+              'bloqueo de fichas'
           )
 
+          # 4. Desactivar Pasar después de terminar
           replace(
               'Button pass=btn("Pasar");addView(pass);',
               'Button pass=btn("Pasar");pass.setEnabled(host.game==null||!host.game.finished);addView(pass);',
-              'bloqueo de pasar al terminar'
+              'bloqueo de pasar'
           )
 
+          # 5. Mostrar resultado real de la mano
           replace(
-              'if(host.game==null)return"Esperando jugadores…";if(host.game.finished)return"Mano terminada";return host.game.turn==0?"Tu turno":"Turno del Jugador "+(host.game.turn+1);',
-              'if(host.game==null)return"Esperando jugadores…";if(host.game.finished)return host.game.result;return host.game.turn==0?"Tu turno":"Turno del Jugador "+(host.game.turn+1);',
-              'resultado visible en anfitrion'
+              'String gameStatus(){if(host.game==null)return"Esperando jugadores…";if(host.game.finished)return"Mano terminada";return host.game.turn==0?"Tu turno":"Turno del Jugador "+(host.game.turn+1);}',
+              'String gameStatus(){if(host.game==null)return"Esperando jugadores…";if(host.game.finished)return host.game.result;return host.game.turn==0?"Tu turno":"Turno del Jugador "+(host.game.turn+1);}',
+              'resultado del anfitrion'
           )
 
           p.write_text(s)
-          print("V4 completada.")
+          print("V4 completada correctamente.")
           PY
 
-      - name: Verificar
+      - name: Verificar cambios
         run: |
           git diff --check
           grep -n "winner=-1" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n "String msg=game.stateFor(0)" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
           grep -n "runOnUiThread" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
           grep -n "host.game.result" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
 
-      - name: Guardar
+      - name: Guardar cambios
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Domino6/app/src/main/java/com/example/domino6/MainActivity.java
-          git diff --cached --quiet || git commit -m "Completar V4 de Domino6"
+          git diff --cached --quiet || git commit -m "Completar V4 Domino6"
           git push
