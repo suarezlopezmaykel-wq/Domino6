@@ -524,7 +524,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Domino6/app/src/main/java/com/example/domino6/MainActivity.java
-          git commit -m "V6 paso 2 Bluetooth puntuacion y nueva mano" || true
+          git commit -m "V6 paso 2 Bluetooth puntuacion y nueva mano" || true 
           git push
 
       - name: Guardar APK
