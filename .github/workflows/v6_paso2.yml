@@ -1,4 +1,4 @@
-name: Prueba V6
+name: V6 Bluetooth paso 2
 
 on:
   workflow_dispatch:
