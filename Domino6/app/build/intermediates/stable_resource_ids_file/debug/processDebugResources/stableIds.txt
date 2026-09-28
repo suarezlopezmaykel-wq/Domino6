@@ -1,0 +1,2 @@
+com.example.domino6:style/AppTheme = 0x7f020000
+com.example.domino6:drawable/ic_domino6 = 0x7f010000

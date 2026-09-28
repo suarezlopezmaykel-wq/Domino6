@@ -1,0 +1,83 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:1:1-14:12
+INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:1:1-14:12
+INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:1:1-14:12
+INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:1:1-14:12
+	package
+		INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:1:11-69
+uses-feature#android.hardware.bluetooth
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:2:5-88
+	android:required
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:2:61-85
+	android:name
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:2:19-60
+uses-permission#android.permission.BLUETOOTH
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:3:5-95
+	android:maxSdkVersion
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:3:66-92
+	android:name
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:3:22-65
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:4:5-101
+	android:maxSdkVersion
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:4:72-98
+	android:name
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:4:22-71
+uses-permission#android.permission.BLUETOOTH_CONNECT
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:5:5-76
+	android:name
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:5:22-73
+uses-permission#android.permission.BLUETOOTH_SCAN
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:6:5-120
+	android:usesPermissionFlags
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:6:71-117
+	android:name
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:6:22-70
+application
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:5-13:19
+INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:5-13:19
+	android:extractNativeLibs
+		INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml
+	android:supportsRtl
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:139-165
+	android:label
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:86-110
+	android:icon
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:18-53
+	android:allowBackup
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:111-138
+	android:theme
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:54-85
+activity#com.example.domino6.MainActivity
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:8:9-12:20
+	android:screenOrientation
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:8:48-84
+	android:exported
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:8:85-108
+	android:name
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:8:19-47
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:9:13-11:29
+action#android.intent.action.MAIN
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:10:17-68
+	android:name
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:10:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:10:68-127
+	android:name
+		ADDED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:10:78-125
+uses-sdk
+INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml
+INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml

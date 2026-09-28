@@ -1,0 +1,75 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.domino6"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="23"
+9        android:targetSdkVersion="35" />
+10
+11    <uses-feature
+11-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:2:5-88
+12        android:name="android.hardware.bluetooth"
+12-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:2:19-60
+13        android:required="false" />
+13-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:2:61-85
+14
+15    <uses-permission
+15-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:3:5-95
+16        android:name="android.permission.BLUETOOTH"
+16-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:3:22-65
+17        android:maxSdkVersion="30" />
+17-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:3:66-92
+18    <uses-permission
+18-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:4:5-101
+19        android:name="android.permission.BLUETOOTH_ADMIN"
+19-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:4:22-71
+20        android:maxSdkVersion="30" />
+20-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:4:72-98
+21    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+21-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:5:5-76
+21-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:5:22-73
+22    <uses-permission
+22-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:6:5-120
+23        android:name="android.permission.BLUETOOTH_SCAN"
+23-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:6:22-70
+24        android:usesPermissionFlags="neverForLocation" />
+24-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:6:71-117
+25
+26    <application
+26-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:5-13:19
+27        android:allowBackup="false"
+27-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:111-138
+28        android:debuggable="true"
+29        android:extractNativeLibs="false"
+30        android:icon="@drawable/ic_domino6"
+30-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:18-53
+31        android:label="Dominó 6"
+31-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:86-110
+32        android:supportsRtl="true"
+32-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:139-165
+33        android:theme="@style/AppTheme" >
+33-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:7:54-85
+34        <activity
+34-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:8:9-12:20
+35            android:name="com.example.domino6.MainActivity"
+35-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:8:19-47
+36            android:exported="true"
+36-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:8:85-108
+37            android:screenOrientation="portrait" >
+37-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:8:48-84
+38            <intent-filter>
+38-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:9:13-11:29
+39                <action android:name="android.intent.action.MAIN" />
+39-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:10:17-68
+39-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:10:25-66
+40
+41                <category android:name="android.intent.category.LAUNCHER" />
+41-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:10:68-127
+41-->/home/runner/work/Domino6/Domino6/Domino6/app/src/main/AndroidManifest.xml:10:78-125
+42            </intent-filter>
+43        </activity>
+44    </application>
+45
+46</manifest>

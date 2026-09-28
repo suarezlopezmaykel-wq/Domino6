@@ -7,6 +7,8 @@ import android.content.*;
 import android.content.pm.PackageManager;
 import android.os.*;
 import android.view.*;
+import android.graphics.*;
+import android.graphics.drawable.GradientDrawable;
 import android.widget.*;
 import java.io.*;
 import java.util.*;
@@ -48,14 +50,149 @@ public class MainActivity extends Activity {
     String safeName(BluetoothDevice d){try{return d.getName()+"\n"+d.getAddress();}catch(Exception e){return "Dispositivo";}}
     void connectToHost(BluetoothDevice dev){client=new NetworkClient(dev); client.start();}
 
-    LinearLayout base(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);l.setPadding(24,50,24,24);l.setGravity(Gravity.CENTER_HORIZONTAL);return l;}
-    TextView title(String s){TextView v=txt(s);v.setTextSize(30);v.setGravity(Gravity.CENTER);v.setPadding(0,0,0,24);return v;}
-    TextView txt(String s){TextView v=new TextView(this);v.setText(s);v.setTextSize(18);v.setPadding(0,12,0,12);return v;}
-    Button btn(String s){Button b=new Button(this);b.setText(s);b.setTextSize(16);b.setAllCaps(false);b.setLayoutParams(new LinearLayout.LayoutParams(-1,-2));return b;}
-    void toast(String s){runOnUiThread(()->Toast.makeText(this,s,Toast.LENGTH_SHORT).show());}
 
-    // ---------- Motor local: jugador vs computadora ----------
-    class LocalGame extends LinearLayout {
+LinearLayout base(){
+    LinearLayout l=new LinearLayout(this);
+    l.setOrientation(LinearLayout.VERTICAL);
+    l.setPadding(18,30,18,18);
+    l.setGravity(Gravity.CENTER_HORIZONTAL);
+    l.setBackgroundColor(Color.rgb(27,76,54));
+    return l;
+}
+
+TextView title(String s){
+    TextView v=txt(s);
+    v.setTextSize(28);
+    v.setGravity(Gravity.CENTER);
+    v.setTextColor(Color.WHITE);
+    v.setPadding(0,8,0,18);
+    return v;
+}
+
+TextView txt(String s){
+    TextView v=new TextView(this);
+    v.setText(s);
+    v.setTextSize(18);
+    v.setTextColor(Color.WHITE);
+    v.setPadding(0,8,0,8);
+    return v;
+}
+
+Button btn(String s){
+    Button b=new Button(this);
+    b.setText(s);
+    b.setTextSize(16);
+    b.setAllCaps(false);
+    b.setTextColor(Color.WHITE);
+
+    GradientDrawable g=new GradientDrawable();
+    g.setColor(Color.rgb(190,145,45));
+    g.setCornerRadius(18);
+    b.setBackground(g);
+
+    LinearLayout.LayoutParams lp=
+        new LinearLayout.LayoutParams(-1,-2);
+    lp.setMargins(0,6,0,6);
+    b.setLayoutParams(lp);
+    return b;
+}
+
+void toast(String s){
+    runOnUiThread(()->
+        Toast.makeText(this,s,Toast.LENGTH_SHORT).show());
+}
+
+class DominoTile extends View {
+    int top,bottom;
+    Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    DominoTile(int a,int b){
+        super(MainActivity.this);
+        top=a;
+        bottom=b;
+        setClickable(true);
+    }
+
+    protected void onDraw(Canvas c){
+        super.onDraw(c);
+
+        float w=getWidth();
+        float h=getHeight();
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.rgb(250,244,222));
+
+        RectF r=new RectF(3,3,w-3,h-3);
+        c.drawRoundRect(r,12,12,paint);
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3);
+        paint.setColor(Color.rgb(91,58,32));
+        c.drawRoundRect(r,12,12,paint);
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2);
+        paint.setColor(Color.rgb(150,130,100));
+        c.drawLine(9,h/2,w-9,h/2,paint);
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.BLACK);
+
+        drawPips(c,top,0,w,h/2);
+        drawPips(c,bottom,h/2,w,h);
+    }
+
+    void drawPips(Canvas c,int n,float y1,float w,float y2){
+        float cx=w/2;
+        float cy=(y1+y2)/2;
+        float dx=w*0.25f;
+        float dy=(y2-y1)*0.25f;
+        float r=Math.max(4f,Math.min(w,getHeight())*0.055f);
+
+        if(n==1){
+            c.drawCircle(cx,cy,r,paint);
+        }else if(n==2){
+            c.drawCircle(cx-dx,cy-dy,r,paint);
+            c.drawCircle(cx+dx,cy+dy,r,paint);
+        }else if(n==3){
+            c.drawCircle(cx-dx,cy-dy,r,paint);
+            c.drawCircle(cx,cy,r,paint);
+            c.drawCircle(cx+dx,cy+dy,r,paint);
+        }else if(n==4){
+            c.drawCircle(cx-dx,cy-dy,r,paint);
+            c.drawCircle(cx+dx,cy-dy,r,paint);
+            c.drawCircle(cx-dx,cy+dy,r,paint);
+            c.drawCircle(cx+dx,cy+dy,r,paint);
+        }else if(n==5){
+            c.drawCircle(cx-dx,cy-dy,r,paint);
+            c.drawCircle(cx+dx,cy-dy,r,paint);
+            c.drawCircle(cx,cy,r,paint);
+            c.drawCircle(cx-dx,cy+dy,r,paint);
+            c.drawCircle(cx+dx,cy+dy,r,paint);
+        }else if(n==6){
+            c.drawCircle(cx-dx,cy-dy,r,paint);
+            c.drawCircle(cx-dx,cy,r,paint);
+            c.drawCircle(cx-dx,cy+dy,r,paint);
+            c.drawCircle(cx+dx,cy-dy,r,paint);
+            c.drawCircle(cx+dx,cy,r,paint);
+            c.drawCircle(cx+dx,cy+dy,r,paint);
+        }
+    }
+}
+
+View tile(Domino d){
+    DominoTile v=new DominoTile(d.a,d.b);
+    v.setLayoutParams(new LinearLayout.LayoutParams(70,120));
+    return v;
+}
+
+void addTile(LinearLayout box,Domino d,View.OnClickListener click){
+    DominoTile v=new DominoTile(d.a,d.b);
+    v.setOnClickListener(click);
+    box.addView(v,new LinearLayout.LayoutParams(70,120));
+}
+
+class LocalGame extends LinearLayout {
         ArrayList<ArrayList<Domino>> hands=new ArrayList<>(); ArrayList<Domino> chain=new ArrayList<>();
         int turn=0,left,right,passCount=0; boolean first=true; boolean cpu;
         LinearLayout handBox; TextView status;
@@ -63,8 +200,68 @@ public class MainActivity extends Activity {
         void start(){setContentView(this);}
         void newGame(){hands.clear();ArrayList<Domino> deck=deck();Collections.shuffle(deck);for(int i=0;i<2;i++)hands.add(new ArrayList<>());for(int k=0;k<7;k++)for(int p=0;p<2;p++)hands.get(p).add(deck.remove(0));chain.clear();first=true;passCount=0;turn=0;draw();}
         ArrayList<Domino> deck(){ArrayList<Domino>d=new ArrayList<>();for(int a=0;a<=6;a++)for(int b=a;b<=6;b++)d.add(new Domino(a,b));return d;}
-        void draw(){removeAllViews();addView(title("DOMINÓ 6"));status=txt(turn==0?"Tu turno":"Turno de la computadora");addView(status);addView(txt(chain.isEmpty()?"Mesa: vacía":"Mesa: "+chainString()));addView(txt("Tus fichas:"));handBox=new LinearLayout(MainActivity.this);handBox.setGravity(Gravity.CENTER);addView(handBox);for(int i=0;i<hands.get(0).size();i++){final int ix=i;Button b=btn(hands.get(0).get(i).toString());handBox.addView(b,new LinearLayout.LayoutParams(0,82,1));b.setOnClickListener(v->playHuman(ix));}Button pass=btn("Pasar");addView(pass);pass.setOnClickListener(v->passHuman());Button menu=btn("Menú");addView(menu);menu.setOnClickListener(v->showMenu());if(turn==1)new Handler().postDelayed(this::cpuMove,450);}
-        String chainString(){StringBuilder s=new StringBuilder();for(Domino d:chain)s.append(d).append(" ");return s.toString();}
+        void draw(){
+    removeAllViews();
+    setBackgroundColor(Color.rgb(27,76,54));
+
+    addView(title("DOMINÓ 6"));
+
+    status=txt(turn==0?
+        "TU TURNO":
+        "Turno de la computadora");
+    addView(status);
+
+    addView(txt(chain.isEmpty()?
+        "Mesa":
+        "Mesa de juego"));
+
+    HorizontalScrollView boardScroll=
+        new HorizontalScrollView(MainActivity.this);
+    LinearLayout boardBox=
+        new LinearLayout(MainActivity.this);
+    boardBox.setPadding(8,8,8,12);
+
+    for(Domino d:chain){
+        boardBox.addView(
+            tile(d),
+            new LinearLayout.LayoutParams(58,100)
+        );
+    }
+
+    boardScroll.addView(boardBox);
+    addView(boardScroll,
+        new LinearLayout.LayoutParams(-1,110));
+
+    addView(txt("Tus fichas:"));
+
+    HorizontalScrollView handScroll=
+        new HorizontalScrollView(MainActivity.this);
+    handBox=new LinearLayout(MainActivity.this);
+    handBox.setGravity(Gravity.CENTER);
+
+    for(int i=0;i<hands.get(0).size();i++){
+        final int ix=i;
+        addTile(handBox,hands.get(0).get(i),
+            v->playHuman(ix));
+    }
+
+    handScroll.addView(handBox);
+    addView(handScroll,
+        new LinearLayout.LayoutParams(-1,130));
+
+    Button pass=btn("Pasar");
+    addView(pass);
+    pass.setOnClickListener(v->passHuman());
+
+    Button menu=btn("Menú");
+    addView(menu);
+    menu.setOnClickListener(v->showMenu());
+
+    if(turn==1)
+        new Handler().postDelayed(this::cpuMove,450);
+}
+
+String chainString(){StringBuilder s=new StringBuilder();for(Domino d:chain)s.append(d).append(" ");return s.toString();}
         boolean valid(Domino d){return first||d.a==left||d.b==left||d.a==right||d.b==right;}
         void place(Domino d){if(first){chain.add(d);left=d.a;right=d.b;first=false;return;}if(d.a==left){chain.add(0,new Domino(d.b,d.a));left=d.b;}else if(d.b==left){chain.add(0,d);left=d.a;}else if(d.a==right){chain.add(d);right=d.b;}else if(d.b==right){chain.add(new Domino(d.b,d.a));right=d.a;}}
         boolean playable(int p){for(Domino d:hands.get(p))if(valid(d))return true;return false;}
@@ -103,8 +300,69 @@ public class MainActivity extends Activity {
 
     class HostGameView extends LinearLayout {
         TextView status,board;LinearLayout handBox;HostGameView(){super(MainActivity.this);setOrientation(VERTICAL);setPadding(10,15,10,10);}void show(){setContentView(this);draw();}
-        void draw(){removeAllViews();addView(title("DOMINÓ 6 · Bluetooth"));addView(txt("Tú eres Jugador 1"));status=txt(gameStatus());addView(status);board=txt(host.game==null?"":host.game.chain.isEmpty()?"Mesa: vacía":"Mesa: "+chainText(host.game.chain));addView(board);addView(txt("Tus fichas:"));handBox=new LinearLayout(MainActivity.this);addView(handBox);if(host.game!=null)for(int i=0;i<host.game.hands.get(0).size();i++){final int ix=i;Button b=btn(host.game.hands.get(0).get(i).toString());handBox.addView(b,new LinearLayout.LayoutParams(0,82,1));b.setEnabled(!host.game.finished);b.setOnClickListener(v->host.action(0,"PLAY|"+ix));}Button pass=btn("Pasar");addView(pass);pass.setOnClickListener(v->host.action(0,"PASS"));Button menu=btn("Salir al menú");addView(menu);menu.setOnClickListener(v->{host.stop();showMenu();});}
-        String gameStatus(){if(host.game==null)return"Esperando jugadores…";if(host.game.finished)return host.game.result;return host.game.turn==0?"Tu turno":"Turno del Jugador "+(host.game.turn+1);}
+        void draw(){
+    removeAllViews();
+    setBackgroundColor(Color.rgb(27,76,54));
+
+    addView(title("DOMINÓ 6 · Bluetooth"));
+    addView(txt("Tú eres Jugador 1"));
+
+    status=txt(gameStatus());
+    addView(status);
+
+    addView(txt("Mesa de juego"));
+
+    HorizontalScrollView boardScroll=
+        new HorizontalScrollView(MainActivity.this);
+    LinearLayout boardBox=
+        new LinearLayout(MainActivity.this);
+    boardBox.setPadding(8,8,8,12);
+
+    if(host.game!=null){
+        for(Domino d:host.game.chain){
+            boardBox.addView(
+                tile(d),
+                new LinearLayout.LayoutParams(58,100)
+            );
+        }
+    }
+
+    boardScroll.addView(boardBox);
+    addView(boardScroll,
+        new LinearLayout.LayoutParams(-1,110));
+
+    addView(txt("Tus fichas:"));
+
+    HorizontalScrollView handScroll=
+        new HorizontalScrollView(MainActivity.this);
+    handBox=new LinearLayout(MainActivity.this);
+
+    if(host.game!=null){
+        for(int i=0;i<host.game.hands.get(0).size();i++){
+            final int ix=i;
+            addTile(handBox,
+                host.game.hands.get(0).get(i),
+                v->host.action(0,"PLAY|"+ix));
+        }
+    }
+
+    handScroll.addView(handBox);
+    addView(handScroll,
+        new LinearLayout.LayoutParams(-1,130));
+
+    Button pass=btn("Pasar");
+    addView(pass);
+    pass.setOnClickListener(v->host.action(0,"PASS"));
+
+    Button menu=btn("Salir al menú");
+    addView(menu);
+    menu.setOnClickListener(v->{
+        host.stop();
+        showMenu();
+    });
+}
+
+String gameStatus(){if(host.game==null)return"Esperando jugadores…";if(host.game.finished)return host.game.result;return host.game.turn==0?"Tu turno":"Turno del Jugador "+(host.game.turn+1);}
         String chainText(ArrayList<Domino> c){StringBuilder s=new StringBuilder();for(Domino d:c)s.append(d).append(' ');return s.toString();}
     }
 
@@ -116,8 +374,91 @@ public class MainActivity extends Activity {
         void decode(String s){String[]a=s.split("\\|",-1);turn=Integer.parseInt(a[2]);winner=Integer.parseInt(a[8]);result=a[9].replace("~","\n");first="1".equals(a[3]);left=Integer.parseInt(a[4]);right=Integer.parseInt(a[5]);passCount=Integer.parseInt(a[6]);finished="1".equals(a[7]);hand=parseDominoList(a.length>10?a[10]:"");chain=parseDominoList(a.length>11?a[11]:"");}
         ArrayList<Domino> parseDominoList(String s){ArrayList<Domino> r=new ArrayList<>();if(s==null||s.isEmpty())return r;for(String z:s.split(";")){{String[]q=z.split(",");if(q.length==2)r.add(new Domino(Integer.parseInt(q[0]),Integer.parseInt(q[1])));}}return r;}
         void send(String s){try{out.println(s);}catch(Exception ignored){}}
-        void drawClient(){removeViewIfAny();LinearLayout l=base();l.addView(title("DOMINÓ 6 · Bluetooth"));l.addView(txt("Eres Jugador "+(me+1)+" de "+n));l.addView(txt(finished?result:(turn==me?"TU TURNO":"Turno del Jugador "+(turn+1))));l.addView(txt(chain.isEmpty()?"Mesa: vacía":"Mesa: "+chainText(chain)));l.addView(txt("Tus fichas:"));LinearLayout hb=new LinearLayout(MainActivity.this);l.addView(hb);for(int i=0;i<hand.size();i++){final int ix=i;Button b=btn(hand.get(i).toString());hb.addView(b,new LinearLayout.LayoutParams(0,82,1));b.setOnClickListener(v->{if(turn==me)send("PLAY|"+ix);});}Button pass=btn("Pasar");l.addView(pass);pass.setOnClickListener(v->{if(turn==me)send("PASS");});Button menu=btn("Menú");l.addView(menu);menu.setOnClickListener(v->{try{socket.close();}catch(Exception ignored){}showMenu();});setContentView(l);}
-        void removeViewIfAny(){}
+        void drawClient(){
+    removeViewIfAny();
+
+    LinearLayout l=base();
+
+    l.addView(title("DOMINÓ 6 · Bluetooth"));
+
+    l.addView(txt(
+        "Eres Jugador "+(me+1)+" de "+n
+    ));
+
+    String estado;
+    if(finished){
+        estado=result;
+    }else{
+        estado=(turn==me)?
+            "TU TURNO":
+            "Turno del Jugador "+(turn+1);
+    }
+
+    TextView st=txt(estado);
+
+    if(finished){
+        st.setBackgroundColor(Color.rgb(120,35,35));
+    }else{
+        st.setBackgroundColor(Color.rgb(55,100,135));
+    }
+
+    l.addView(st);
+
+    l.addView(txt("Mesa de juego"));
+
+    HorizontalScrollView boardScroll=
+        new HorizontalScrollView(MainActivity.this);
+    LinearLayout boardBox=
+        new LinearLayout(MainActivity.this);
+    boardBox.setPadding(8,8,8,12);
+
+    for(Domino d:chain){
+        boardBox.addView(
+            tile(d),
+            new LinearLayout.LayoutParams(58,100)
+        );
+    }
+
+    boardScroll.addView(boardBox);
+    l.addView(boardScroll,
+        new LinearLayout.LayoutParams(-1,110));
+
+    l.addView(txt("Tus fichas:"));
+
+    HorizontalScrollView handScroll=
+        new HorizontalScrollView(MainActivity.this);
+    LinearLayout hb=new LinearLayout(MainActivity.this);
+
+    for(int i=0;i<hand.size();i++){
+        final int ix=i;
+        addTile(hb,hand.get(i),v->{
+            if(turn==me && !finished)
+                send("PLAY|"+ix);
+        });
+    }
+
+    handScroll.addView(hb);
+    l.addView(handScroll,
+        new LinearLayout.LayoutParams(-1,130));
+
+    Button pass=btn("Pasar");
+    l.addView(pass);
+    pass.setOnClickListener(v->{
+        if(turn==me && !finished)
+            send("PASS");
+    });
+
+    Button menu=btn("Menú");
+    l.addView(menu);
+    menu.setOnClickListener(v->{
+        try{socket.close();}catch(Exception ignored){}
+        showMenu();
+    });
+
+    setContentView(l);
+}
+
+void removeViewIfAny(){}
         String chainText(ArrayList<Domino> c){StringBuilder s=new StringBuilder();for(Domino d:c)s.append(d).append(' ');return s.toString();}
     }
     static class Domino implements Serializable {int a,b;Domino(int a,int b){this.a=a;this.b=b;}public String toString(){return "["+a+"|"+b+"]";}}
