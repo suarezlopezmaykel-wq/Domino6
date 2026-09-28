@@ -10,10 +10,17 @@ permissions:
 jobs:
   activar_v6:
     runs-on: ubuntu-latest
+
     steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
       - name: Activar V6 paso 2
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run v6_paso2.yml --ref main
+          echo "V6 paso 2 activado"
         run: |
           gh workflow run v6_paso2.yml --ref main
           echo "V6 paso 2 activado"
