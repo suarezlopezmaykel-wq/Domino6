@@ -1,0 +1,11 @@
+name: Prueba V6
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prueba:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prueba
+        run: echo "V6 OK"
