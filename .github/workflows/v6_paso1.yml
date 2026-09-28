@@ -32,10 +32,6 @@ jobs:
                   "chain.clear();first=true;passCount=0;handFinished=false;turn=starter;opener=starter;draw();"
               ),
               (
-                  'addView(title("DOMINÓ 6"));',
-                  'addView(title("DOMINÓ 6"));\n    addView(txt("Tu puntuación: "+fmt(score[0])));'
-              ),
-              (
                   'if(hands.get(0).isEmpty()){finish("¡Has ganado la mano!");return;}',
                   'if(hands.get(0).isEmpty()){score[0]+=2;finish("¡Has ganado la mano!\\n+1 punto");return;}'
               ),
