@@ -131,7 +131,7 @@ jobs:
                   float cy=(y1+y2)/2;
                   float dx=w*0.25f;
                   float dy=(y2-y1)*0.25f;
-                  float r=Math.max(4,Math.min(w,h)*0.055f);
+                  float r=Math.max(4f,Math.min(w,h)*0.055f);
 
                   if(n==1){
                       c.drawCircle(cx,cy,r,paint);
