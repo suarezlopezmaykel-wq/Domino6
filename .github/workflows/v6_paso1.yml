@@ -1,0 +1,106 @@
+name: V6 paso 1 - puntuacion
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  v6:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Aplicar cambios V6
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          p = Path("Domino6/app/src/main/java/com/example/domino6/MainActivity.java")
+          s = p.read_text()
+
+          changes = [
+              (
+                  "int turn=0,left,right,passCount=0; boolean first=true; boolean cpu;",
+                  "int turn=0,left,right,passCount=0; boolean first=true; boolean cpu; int[] score={0,0}; int starter=0,opener=0; boolean handFinished=false;"
+              ),
+              (
+                  "chain.clear();first=true;passCount=0;turn=0;draw();",
+                  "chain.clear();first=true;passCount=0;handFinished=false;turn=starter;opener=starter;draw();"
+              ),
+              (
+                  'addView(title("DOMINÓ 6"));',
+                  'addView(title("DOMINÓ 6"));\n    addView(txt("Tu puntuación: "+fmt(score[0])));'
+              ),
+              (
+                  'if(hands.get(0).isEmpty()){finish("¡Has ganado la mano!");return;}',
+                  'if(hands.get(0).isEmpty()){score[0]+=2;finish("¡Has ganado la mano!\\n+1 punto");return;}'
+              ),
+              (
+                  'if(hands.get(1).isEmpty()){finish("La computadora ganó la mano.");return;}',
+                  'if(hands.get(1).isEmpty()){score[1]+=2;finish("La computadora ganó la mano.\\n+1 punto");return;}'
+              )
+          ]
+
+          for old, new in changes:
+              if old not in s:
+                  raise SystemExit("No se encontró: " + old[:80])
+              s = s.replace(old, new, 1)
+
+          old = 'void tranca(){int a=points(hands.get(0)),b=points(hands.get(1));String s="PARTIDA TRANCADA\\n\\nTú: "+a+" puntos\\nComputadora: "+b+" puntos\\n\\n"+(a<b?"🏆 Ganas tú":b<a?"🏆 Gana la computadora":"Empate: misma cantidad de puntos");finish(s);}'
+
+          new = 'void tranca(){int a=points(hands.get(0)),b=points(hands.get(1));String s="PARTIDA TRANCADA\\n\\nTú: "+a+" puntos\\nComputadora: "+b+" puntos\\n\\n";if(a<b){score[0]+=2;starter=0;s+="🏆 Ganas tú\\n+1 punto";}else if(b<a){score[1]+=2;starter=1;s+="🏆 Gana la computadora\\n+1 punto";}else{score[0]++;score[1]++;starter=opener;s+="⚖ Empate: ambos reciben +0.5 punto";}finish(s);}'
+
+          if old not in s:
+              raise SystemExit("No se encontró el método tranca")
+
+          s = s.replace(old, new, 1)
+
+          old = 'void finish(String s){new AlertDialog.Builder(MainActivity.this).setTitle("Fin de la mano").setMessage(s).setPositiveButton("Nueva mano",(d,w)->newGame()).setNegativeButton("Menú",(d,w)->showMenu()).setCancelable(false).show();}'
+
+          new = 'String fmt(int x){return x/2+(x%2==0?".0":".5");}\n        void finish(String s){handFinished=true;new AlertDialog.Builder(MainActivity.this).setTitle("Fin de la mano").setMessage(s+"\\n\\nPuntuación: Tú "+fmt(score[0])+" · Computadora "+fmt(score[1])).setPositiveButton("Nueva mano",(d,w)->newGame()).setNegativeButton("Menú",(d,w)->showMenu()).setCancelable(false).show();}'
+
+          if old not in s:
+              raise SystemExit("No se encontró finish")
+
+          s = s.replace(old, new, 1)
+
+          p.write_text(s)
+          print("V6 paso 1 aplicado correctamente.")
+          PY
+
+      - name: Verificar código
+        run: |
+          git diff --check
+          grep -n "int\\[\\] score" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          grep -n "starter=opener" Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Compilar APK V6
+        working-directory: Domino6
+        run: gradle assembleDebug --stacktrace
+
+      - name: Guardar cambios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Domino6/app/src/main/java/com/example/domino6/MainActivity.java
+          git commit -m "V6 paso 1 puntuacion y apertura" || true
+          git push
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Domino6-V6-paso1-debug
+          path: Domino6/app/build/outputs/apk/debug/app-debug.apk
