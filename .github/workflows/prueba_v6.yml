@@ -3,9 +3,17 @@ name: Prueba V6
 on:
   workflow_dispatch:
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
-  prueba:
+  activar_v6:
     runs-on: ubuntu-latest
     steps:
-      - name: Prueba
-        run: echo "V6 OK"
+      - name: Activar V6 paso 2
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run v6_paso2.yml --ref main
+          echo "V6 paso 2 activado"
