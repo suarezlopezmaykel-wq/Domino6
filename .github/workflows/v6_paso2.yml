@@ -1,4 +1,4 @@
-name: V6 paso 2 - Bluetooth puntuacion
+name: Prueba V6
 
 on:
   workflow_dispatch:
