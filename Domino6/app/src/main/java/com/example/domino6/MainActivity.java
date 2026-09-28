@@ -194,11 +194,11 @@ void addTile(LinearLayout box,Domino d,View.OnClickListener click){
 
 class LocalGame extends LinearLayout {
         ArrayList<ArrayList<Domino>> hands=new ArrayList<>(); ArrayList<Domino> chain=new ArrayList<>();
-        int turn=0,left,right,passCount=0; boolean first=true; boolean cpu;
+        int turn=0,left,right,passCount=0; boolean first=true; boolean cpu; int[] score={0,0}; int starter=0,opener=0; boolean handFinished=false;
         LinearLayout handBox; TextView status;
         LocalGame(int n,boolean cpu,int ignored){super(MainActivity.this);this.cpu=cpu;setOrientation(VERTICAL);setPadding(10,15,10,10);newGame();}
         void start(){setContentView(this);}
-        void newGame(){hands.clear();ArrayList<Domino> deck=deck();Collections.shuffle(deck);for(int i=0;i<2;i++)hands.add(new ArrayList<>());for(int k=0;k<7;k++)for(int p=0;p<2;p++)hands.get(p).add(deck.remove(0));chain.clear();first=true;passCount=0;turn=0;draw();}
+        void newGame(){hands.clear();ArrayList<Domino> deck=deck();Collections.shuffle(deck);for(int i=0;i<2;i++)hands.add(new ArrayList<>());for(int k=0;k<7;k++)for(int p=0;p<2;p++)hands.get(p).add(deck.remove(0));chain.clear();first=true;passCount=0;handFinished=false;turn=starter;opener=starter;draw();}
         ArrayList<Domino> deck(){ArrayList<Domino>d=new ArrayList<>();for(int a=0;a<=6;a++)for(int b=a;b<=6;b++)d.add(new Domino(a,b));return d;}
         void draw(){
     removeAllViews();
@@ -265,12 +265,13 @@ String chainString(){StringBuilder s=new StringBuilder();for(Domino d:chain)s.ap
         boolean valid(Domino d){return first||d.a==left||d.b==left||d.a==right||d.b==right;}
         void place(Domino d){if(first){chain.add(d);left=d.a;right=d.b;first=false;return;}if(d.a==left){chain.add(0,new Domino(d.b,d.a));left=d.b;}else if(d.b==left){chain.add(0,d);left=d.a;}else if(d.a==right){chain.add(d);right=d.b;}else if(d.b==right){chain.add(new Domino(d.b,d.a));right=d.a;}}
         boolean playable(int p){for(Domino d:hands.get(p))if(valid(d))return true;return false;}
-        void playHuman(int i){if(turn!=0)return;Domino d=hands.get(0).get(i);if(!valid(d)){toast("Esa ficha no puede colocarse.");return;}place(d);hands.get(0).remove(i);passCount=0;if(hands.get(0).isEmpty()){finish("¡Has ganado la mano!");return;}turn=1;draw();}
+        void playHuman(int i){if(turn!=0)return;Domino d=hands.get(0).get(i);if(!valid(d)){toast("Esa ficha no puede colocarse.");return;}place(d);hands.get(0).remove(i);passCount=0;if(hands.get(0).isEmpty()){score[0]+=2;finish("¡Has ganado la mano!\n+1 punto");return;}turn=1;draw();}
         void passHuman(){if(turn!=0)return;if(playable(0)){toast("Tienes una ficha que puedes jugar.");return;}passCount++;if(passCount>=2){tranca();return;}turn=1;draw();}
-        void cpuMove(){if(playable(1)){for(int i=0;i<hands.get(1).size();i++){if(valid(hands.get(1).get(i))){Domino d=hands.get(1).remove(i);place(d);passCount=0;if(hands.get(1).isEmpty()){finish("La computadora ganó la mano.");return;}turn=0;draw();return;}}}passCount++;if(passCount>=2){tranca();return;}turn=0;draw();}
-        void tranca(){int a=points(hands.get(0)),b=points(hands.get(1));String s="PARTIDA TRANCADA\n\nTú: "+a+" puntos\nComputadora: "+b+" puntos\n\n"+(a<b?"🏆 Ganas tú":b<a?"🏆 Gana la computadora":"Empate: misma cantidad de puntos");finish(s);}
+        void cpuMove(){if(playable(1)){for(int i=0;i<hands.get(1).size();i++){if(valid(hands.get(1).get(i))){Domino d=hands.get(1).remove(i);place(d);passCount=0;if(hands.get(1).isEmpty()){score[1]+=2;finish("La computadora ganó la mano.\n+1 punto");return;}turn=0;draw();return;}}}passCount++;if(passCount>=2){tranca();return;}turn=0;draw();}
+        void tranca(){int a=points(hands.get(0)),b=points(hands.get(1));String s="PARTIDA TRANCADA\n\nTú: "+a+" puntos\nComputadora: "+b+" puntos\n\n";if(a<b){score[0]+=2;starter=0;s+="🏆 Ganas tú\n+1 punto";}else if(b<a){score[1]+=2;starter=1;s+="🏆 Gana la computadora\n+1 punto";}else{score[0]++;score[1]++;starter=opener;s+="⚖ Empate: ambos reciben +0.5 punto";}finish(s);}
         int points(ArrayList<Domino> h){int x=0;for(Domino d:h)x+=d.a+d.b;return x;}
-        void finish(String s){new AlertDialog.Builder(MainActivity.this).setTitle("Fin de la mano").setMessage(s).setPositiveButton("Nueva mano",(d,w)->newGame()).setNegativeButton("Menú",(d,w)->showMenu()).setCancelable(false).show();}
+        String fmt(int x){return x/2+(x%2==0?".0":".5");}
+        void finish(String s){handFinished=true;new AlertDialog.Builder(MainActivity.this).setTitle("Fin de la mano").setMessage(s+"\n\nPuntuación: Tú "+fmt(score[0])+" · Computadora "+fmt(score[1])).setPositiveButton("Nueva mano",(d,w)->newGame()).setNegativeButton("Menú",(d,w)->showMenu()).setCancelable(false).show();}
     }
 
     // ---------- Bluetooth host: autoridad de la partida ----------
