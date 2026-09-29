@@ -1,4 +1,7 @@
-name: V6 Paso 2 - Compilacion base
+- name: Compilar APK
+  working-directory: Domino6
+  run: |
+    gradle assembleDebug --stacktrace
 
 on:
   workflow_dispatch:
