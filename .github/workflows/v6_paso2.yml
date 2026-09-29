@@ -1,4 +1,4 @@
-name: V6 Bluetooth paso 2 corregido
+name: Prueba V6 Bluetooth
 
 on:
   workflow_dispatch:
