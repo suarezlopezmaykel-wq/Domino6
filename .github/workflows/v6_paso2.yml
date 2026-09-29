@@ -1,11 +1,7 @@
-name: V6 Bluetooth paso 2
+name: V6 Bluetooth paso 2 corregido
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/v6_paso2.yml'
-      - 'Domino6/**'
 
 permissions:
   contents: write
